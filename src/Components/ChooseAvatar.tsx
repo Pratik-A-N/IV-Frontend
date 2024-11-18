@@ -6,12 +6,9 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { animationListState, selectedAnimationState } from '@/Atoms/animationAtom';
 import { useAnimations } from '@react-three/drei';
 import { Box3, Vector3 } from 'three';
+import { AvartarModelName } from '@/Interfaces/CommonModelName';
 
-interface ChooseAvatarProps {
-    modelName: string; // Specify the type of modelName
-}
-
-function ChooseAvatar({modelName}: ChooseAvatarProps){
+function ChooseAvatar({modelName}: AvartarModelName){
   const modelpath = modelPath(modelName);
   const gltf = useLoader(GLTFLoader, modelpath);
   const [ , setanimationList ] = useRecoilState(animationListState);

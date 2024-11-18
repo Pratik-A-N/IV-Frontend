@@ -1,35 +1,51 @@
-
-import modelpath from '../assets/models/walk.glb';
-import { useEffect, useState } from "react";
-import { useAnimations } from "@react-three/drei";
+import { useEffect, useRef, useState } from "react";
+import { Html, useAnimations } from "@react-three/drei";
 import { useFrame, useLoader } from '@react-three/fiber';
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
-import { Vector3 } from 'three';
+import { Group, Vector3 } from 'three';
+import { modelPath } from "@/Utilities/helper";
+import { PerspectiveCamera as PerspectiveCameraType } from "three";
+import { UserInRoom } from "@/Interfaces/CommonModelName";
+import useSocket from "@/Hooks/useSocket";
 
-function Avatar({cameraRef }){
+interface AvartarModeProps{
+  cameraRef: React.MutableRefObject<PerspectiveCameraType | undefined>,
+  user: UserInRoom
+}
+
+function Avatar({cameraRef, user}: AvartarModeProps){
+  const modelpath = modelPath(user.modelName);
+  // const isCurrentUser = (localStorage.getItem("username") === user.username);
   const gltf = useLoader(GLTFLoader, modelpath);
+  const { changedMyPosition } = useSocket();
   const {actions}  = useAnimations(gltf.animations, gltf.scene);
   const [movement, setMovement] = useState({ forward: false, backward: false, left: false, right: false });
   const velocity = 0.05;
+  const roomId = localStorage.getItem('roomId') ?? "";
+  const username = localStorage.getItem('username') ?? "";
   const movementDirection = new Vector3();
+  const idleAction = Object.keys(actions).find((key) =>
+    key.toLowerCase().includes("idle")
+  );
+  const walk = Object.keys(actions).find((key)=> key.toLowerCase().includes("walk"));
+  const groupRef = useRef<Group>(null);
 
   useEffect(()=>{
-    // align the model and walk axis
-    gltf.nodes._100Avatars_102_BizDude.parent.children[1].rotation.set(-Math.PI/2,0,0,'XYZ')
-    actions['Armature|mixamo.com|Layer0']?.play()
+    console.log(gltf)
+    actions[idleAction ?? ""]?.play()
   })
 
    // Function to start the walking animation
    const startWalking = () => {
-    if (actions['Armature|mixamo.com|Layer0']) {
-      actions['Armature|mixamo.com|Layer0'].play();
+    if (walk && actions[walk]) {
+      actions[walk].play();
     }
   };
 
   // Function to stop the walking animation
   const stopWalking = () => {
-    if (actions['Armature|mixamo.com|Layer0']) {
-      actions['Armature|mixamo.com|Layer0'].stop();
+    if (walk && actions[walk]) {
+      actions[walk].stop();
     }
   };
 
@@ -86,34 +102,45 @@ function Avatar({cameraRef }){
 
     if (forward || backward || left || right) {
       startWalking();
-      gltf.scene.getWorldDirection(movementDirection);
+      groupRef.current?.getWorldDirection(movementDirection);
       if (left) {
-        gltf.scene.rotation.y += 0.05;  // Rotate to the left
+        groupRef.current!.rotation.y += 0.05;  // Rotate to the left
       }
       if (right) {
-        gltf.scene.rotation.y -= 0.05;  // Rotate to the right
+        groupRef.current!.rotation.y -= 0.05;  // Rotate to the right
       }
 
       // Handle forward/backward movement
       if (forward) {
-        gltf.scene.position.add(movementDirection.multiplyScalar(velocity));
+        groupRef.current!.position.add(movementDirection.multiplyScalar(velocity));
+        changedMyPosition(roomId, username, groupRef.current?.position);
       }
+      
       if (backward) {
-        gltf.scene.position.add(movementDirection.multiplyScalar(-velocity));
+        groupRef.current!.position.add(movementDirection.multiplyScalar(-velocity));
       }
-      // console.log(gltf.scene.position);
-      if(cameraRef.current){
+      
+
+      if(cameraRef){
         if(forward || backward){
-          cameraRef.current.position.add(movementDirection.multiplyScalar(velocity*20));
+          cameraRef.current!.position.add(movementDirection.multiplyScalar(velocity*20));
         }
       }
     }else{
       stopWalking()
     }
-    cameraRef.current.lookAt(gltf.scene.position)
+    cameraRef.current!.lookAt(groupRef.current!.position)
   })
 
-  return <primitive object={gltf.scene} position={[0, 0, 0]} />;
+  return <group ref={groupRef}>
+  <primitive object={gltf.scene} />
+  {/* Display username above the model */}
+  <Html position={[0, 2, 0]} center>
+    <div style={{ color: "white", backgroundColor: "rgba(0, 0, 0, 0.5)", padding: "4px", borderRadius: "4px" }}>
+      {user.username}
+    </div>
+  </Html>
+</group>
 }
 
 export default Avatar

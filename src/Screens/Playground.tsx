@@ -5,27 +5,40 @@ import Avatar from "../Components/Avatar";
 import Controls from "../Components/Controls";
 import { PerspectiveCamera, Stars } from "@react-three/drei";
 import AxisLabels from "../Components/AxisLabel";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PerspectiveCamera as PerspectiveCameraType } from "three";
+import useSocket from "@/Hooks/useSocket";
+import { useRecoilValue } from "recoil";
+import { RoomUsersState } from "@/Atoms/roomUsersAtom";
+import OtherAvatar from "@/Components/OtherAvatar";
+
+
 
 export function PlayGround(){
     const cameraRef = useRef<PerspectiveCameraType>();
+    const userAvatar = localStorage.getItem('userAvatar') ?? "";
+    const allUsers = useRecoilValue(RoomUsersState);
+    const otherUsers = allUsers.filter(user => user.username != localStorage.getItem('username'));
+    const currUser = allUsers.find(usr => usr.username == localStorage.getItem('username'));
 
-    return (<div id="canvas-container">
+    useEffect(()=>{
+      console.log(allUsers);
+    },[allUsers])
+
+    return (<div className="w-screen h-screen">
         <Canvas shadows>
-          {/* Lighting */}
-          {/* Set up the camera and controls */}
           <PerspectiveCamera ref={cameraRef} makeDefault position={[0,5,-10]} />
         
           <Lighting />
   
           {/* Ground Plane */}
           <Ground/>
-  
-          <Avatar cameraRef={cameraRef}/>
-          {/* Orbit Controls */}
-          <Controls />
-  
+
+          <Avatar cameraRef={cameraRef} user={currUser!} />
+          {otherUsers.map((user) => (
+              <OtherAvatar key={user.username} user={user} />
+          ))}
+                   
           {/* Environment - Stars */}
           <Stars />
           <axesHelper args={[5]} />

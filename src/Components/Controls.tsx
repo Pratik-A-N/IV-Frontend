@@ -1,8 +1,13 @@
 import { OrbitControls } from '@react-three/drei';
 
-function Controls() {
+interface ControlsPropType{
+  minDist: number,
+  maxDist: number
+}
+
+function Controls({minDist,maxDist}: ControlsPropType) {
   return (
-    <OrbitControls enablePan={true} enableZoom={true} minDistance={2} maxDistance={5} maxPolarAngle={Math.PI / 2} />
+    <OrbitControls enablePan={true} enableZoom={true} minDistance={minDist} maxDistance={maxDist} maxPolarAngle={Math.PI / 2} />
   );
 }
 

@@ -1,8 +1,8 @@
-import { signUpSchema } from "@/schemas/signUpSchema"
+import { signUpSchema } from "@/schemas/authSchema"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/Components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/Components/ui/form"
 import { Button } from "@/Components/ui/button"
 import { Input } from "@/Components/ui/input"
 import { Canvas } from "@react-three/fiber"
@@ -13,10 +13,12 @@ import ChooseAvatar from "@/Components/ChooseAvatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
 import { useRecoilState } from "recoil"
 import { animationListState, selectedAnimationState } from "@/Atoms/animationAtom"
-import { useEffect, useState } from "react"
-import { formatAnimationName, modelList, modelMapping } from "@/Utilities/helper"
+import { useState } from "react"
+import { formatAnimationName, modelList } from "@/Utilities/helper"
 import { AnimationClip as AnimationClipType } from "three"
-
+import axios from "axios"
+import { baseURL } from "@/Constants/UriConstants"
+import { useNavigate, useNavigation } from "react-router-dom"
 
 export function SignUp(){
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -29,21 +31,29 @@ export function SignUp(){
     },
   })
   
+  
   const animationList = useRecoilState(animationListState);
   const [, setSelectedAnimation] = useRecoilState(selectedAnimationState);
   const [selectedAvatar, setSelectedAvatar] = useState("Adventurer");
-  useEffect(()=>{
-    
-  })
+  const navigate = useNavigate()
 
-  function onSubmit(values: z.infer<typeof signUpSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+  async function onSubmit(values: z.infer<typeof signUpSchema>) {
+    try {
+      await axios.post(baseURL + 'authenticate/signUp', values)
+      .then((res)=>{
+        alert(res.data.message);
+      })
+    } catch (error) {
+      alert(error)
+    }
   }
 
   const handleAnimationSelect = (event : AnimationClipType) => {
     setSelectedAnimation(event)
+  }
+
+  const navigateToLogin = ()=>{
+    navigate("/login")
   }
 
   return <div className="flex">
@@ -85,7 +95,7 @@ export function SignUp(){
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input placeholder="eg. abc@example.com" {...field} />
+                  <Input type="password" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -117,7 +127,11 @@ export function SignUp(){
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <div className="flex items-baseline">
+            <Button type="submit">Submit</Button>
+            <p className="px-5">Or</p>
+            <Button onClick={navigateToLogin} >Login</Button>
+          </div>
         </form>
         </Form>
       </div>
@@ -145,7 +159,7 @@ export function SignUp(){
     
             <ChooseAvatar modelName={selectedAvatar} /> 
 
-            <Controls />
+            <Controls minDist={2} maxDist={5} />
         </Canvas>
           
         
