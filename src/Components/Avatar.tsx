@@ -113,7 +113,7 @@ function Avatar({cameraRef, user}: AvartarModeProps){
       // Handle forward/backward movement
       if (forward) {
         groupRef.current!.position.add(movementDirection.multiplyScalar(velocity));
-        changedMyPosition(roomId, username, groupRef.current?.position);
+        // changedMyPosition(roomId, username, groupRef.current?.position);
       }
       
       if (backward) {
