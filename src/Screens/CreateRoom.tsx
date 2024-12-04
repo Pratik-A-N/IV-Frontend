@@ -27,6 +27,10 @@ export const CreateRoom = () => {
     });
   };
 
+  const handleJoinRoom = () =>{
+    navigate('/joinRoom')
+  }
+
   return (
     <div className="w-screen h-screen flex justify-center items-center" >
         <div className="w-1/4 flex flex-col justify-center">
@@ -37,6 +41,7 @@ export const CreateRoom = () => {
                 placeholder="Enter room name"
             />
             <Button onClick={handleCreateRoom}>Create Room</Button>
+            <Button onClick={handleJoinRoom}>Join Room</Button>
         </div>
     </div>
   );
