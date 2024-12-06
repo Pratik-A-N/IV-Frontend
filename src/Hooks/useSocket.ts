@@ -22,7 +22,7 @@ const useSocket = () => {
     });
 
     socket.on("userJoined", (roomUsers) => {
-        console.log(roomUsers);
+        // console.log(roomUsers);
         setUsersInRoom(roomUsers);
     });
   },[]);
@@ -38,8 +38,8 @@ const useSocket = () => {
   };
 
   // Funtion to trigger when current position changes
-  const changedMyPosition = (roomId: string, username: string, position: number[]) => {
-    socket.emit("changedMyPosition",{roomId, username, position});
+  const changedMyPosition = (roomId: string, username: string, position: number[], rotationY: number, movement: boolean) => {
+    socket.emit("changedMyPosition",{roomId, username, position, rotationY, movement});
   }
   
   // Return functions to interact with the WebSocket server

@@ -21,9 +21,9 @@ export function PlayGround(){
     const otherUsers = allUsers.filter(user => user.username != localStorage.getItem('username'));
     const currUser = allUsers.find(usr => usr.username == localStorage.getItem('username'));
 
-    useEffect(()=>{
-      console.log(allUsers);
-    },[allUsers])
+    // useEffect(()=>{
+    //   // console.log(allUsers);
+    // },[allUsers])
 
     return (<div className="w-screen h-screen">
         <Canvas shadows>

@@ -15,7 +15,6 @@ interface AvartarModeProps{
 
 function Avatar({cameraRef, user}: AvartarModeProps){
   const modelpath = modelPath(user.modelName);
-  // const isCurrentUser = (localStorage.getItem("username") === user.username);
   const gltf = useLoader(GLTFLoader, modelpath);
   const { changedMyPosition } = useSocket();
   const {actions}  = useAnimations(gltf.animations, gltf.scene);
@@ -31,7 +30,8 @@ function Avatar({cameraRef, user}: AvartarModeProps){
   const groupRef = useRef<Group>(null);
 
   useEffect(()=>{
-    console.log(gltf)
+    // console.log(gltf)
+    // console.log(groupRef.current);
     actions[idleAction ?? ""]?.play()
   })
 
@@ -97,6 +97,11 @@ function Avatar({cameraRef, user}: AvartarModeProps){
     };
   },[])
 
+  const triggerMovementEvent = (movement: boolean)=>{
+    // console.log(groupRef.current?.rotation.y);
+    changedMyPosition(roomId, username, [groupRef.current?.position.x ?? 0,groupRef.current?.position.y ?? 0,groupRef.current?.position.z ?? 0], groupRef.current!.rotation.y,movement);
+  }
+
   useFrame(()=>{
     const { forward, backward, left, right } = movement;
 
@@ -105,19 +110,22 @@ function Avatar({cameraRef, user}: AvartarModeProps){
       groupRef.current?.getWorldDirection(movementDirection);
       if (left) {
         groupRef.current!.rotation.y += 0.05;  // Rotate to the left
+        triggerMovementEvent(true);
       }
       if (right) {
         groupRef.current!.rotation.y -= 0.05;  // Rotate to the right
+        triggerMovementEvent(true);
       }
 
       // Handle forward/backward movement
       if (forward) {
         groupRef.current!.position.add(movementDirection.multiplyScalar(velocity));
-        changedMyPosition(roomId, username, [groupRef.current?.position.x ?? 0,groupRef.current?.position.y ?? 0,groupRef.current?.position.z ?? 0]);
+        triggerMovementEvent(true)
       }
       
       if (backward) {
         groupRef.current!.position.add(movementDirection.multiplyScalar(-velocity));
+        triggerMovementEvent(true)
       }
       
 
@@ -128,19 +136,20 @@ function Avatar({cameraRef, user}: AvartarModeProps){
       }
     }else{
       stopWalking()
+      triggerMovementEvent(false);
     }
     cameraRef.current!.lookAt(groupRef.current!.position)
   })
 
   return <group ref={groupRef}>
-  <primitive object={gltf.scene} />
-  {/* Display username above the model */}
-  <Html position={[0, 2, 0]} center>
-    <div style={{ color: "white", backgroundColor: "rgba(0, 0, 0, 0.5)", padding: "4px", borderRadius: "4px" }}>
-      {user.username}
-    </div>
-  </Html>
-</group>
+          <primitive object={gltf.scene} />
+          {/* Display username above the model */}
+          <Html position={[0, 2, 0]} center>
+            <div style={{ color: "white", backgroundColor: "rgba(0, 0, 0, 0.5)", padding: "4px", borderRadius: "4px" }}>
+              You
+            </div>
+          </Html>
+        </group>
 }
 
 export default Avatar
