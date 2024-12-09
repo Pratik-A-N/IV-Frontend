@@ -22,7 +22,6 @@ const useSocket = () => {
     });
 
     socket.on("userJoined", (roomUsers) => {
-        // console.log(roomUsers);
         setUsersInRoom(roomUsers);
     });
   },[]);

@@ -8,7 +8,6 @@ import { LoginScreen } from './Screens/Login';
 import { useEffect, useState } from 'react';
 import { CreateRoom } from './Screens/CreateRoom';
 import { JoinRoom } from './Screens/JoinRoom';
-import { TestingPlayground } from './Screens/TestingPlayground';
 
 
 function App() {
@@ -21,10 +20,9 @@ function App() {
       <BrowserRouter>
       <Routes>
           <Route index element={<Home />} />
-          <Route path='playground' element={ isLoggedIn ? <PlayGround /> : <LoginScreen/>} />
-          <Route path='testplay' element={ isLoggedIn ? <TestingPlayground/> : <LoginScreen/> } />
-          <Route path='createRoom' element={ isLoggedIn ? <CreateRoom /> : <LoginScreen/>} />
-          <Route path='joinRoom' element={ isLoggedIn ? <JoinRoom /> : <LoginScreen/>} />
+          <Route path='playground' element={<PlayGround />} />
+          <Route path='createRoom' element={<CreateRoom />} />
+          <Route path='joinRoom' element={<JoinRoom />} />
           <Route path='signUp' element={ <RecoilRoot><SignUp/></RecoilRoot>} />
           <Route path='login' element={<LoginScreen/>} />
       </Routes>

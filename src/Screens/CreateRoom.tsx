@@ -1,14 +1,22 @@
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSocket from "@/Hooks/useSocket";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const CreateRoom = () => {
   const [roomName, setRoomName] = useState("");
   const { createRoom } = useSocket();
   const navigate = useNavigate();
   const modelName = localStorage.getItem('userAvatar') ?? "";
+
+  useEffect(()=>{
+    let token = localStorage.getItem('token')
+    if(!token){
+      alert("User Not Logged In")
+      navigate("/login")
+    }
+  },[])
 
   const handleCreateRoom = () => {
     if (!roomName.trim()) {
@@ -27,9 +35,6 @@ export const CreateRoom = () => {
     });
   };
 
-  const handleJoinRoom = () =>{
-    navigate('/joinRoom')
-  }
 
   return (
     <div className="w-screen h-screen flex justify-center items-center" >
@@ -38,10 +43,13 @@ export const CreateRoom = () => {
                 className="mb-5"
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
-                placeholder="Enter room name"
+                placeholder="Create room name"
             />
-            <Button onClick={handleCreateRoom}>Create Room</Button>
-            <Button onClick={handleJoinRoom}>Join Room</Button>
+            <div className="flex justify-evenly">
+              <div><Button onClick={handleCreateRoom}>Create Room</Button></div>
+              <div>or</div>
+              <div><Link to="/joinRoom"><Button>Join Room</Button></Link></div>
+            </div>
         </div>
     </div>
   );
