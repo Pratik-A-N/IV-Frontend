@@ -9,6 +9,7 @@ export const JoinRoom = () => {
   const [roomId, setRoomId] = useState("");
   const { joinRoom } = useSocket();
   const modelName = localStorage.getItem('userAvatar') ?? "";
+  const username =  localStorage.getItem('username') ?? "";
   const navigate = useNavigate();
 
   useEffect(()=>{
@@ -25,7 +26,7 @@ export const JoinRoom = () => {
       return;
     }
 
-    joinRoom(roomId,modelName);
+    joinRoom(username, roomId, modelName);
     localStorage.setItem('roomId',roomId)
     navigate("/playground")
     setRoomId("");

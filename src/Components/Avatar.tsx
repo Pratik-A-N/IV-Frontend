@@ -7,6 +7,7 @@ import { modelPath } from "@/Utilities/helper";
 import { PerspectiveCamera as PerspectiveCameraType } from "three";
 import { UserInRoom } from "@/Interfaces/CommonModelName";
 import useSocket from "@/Hooks/useSocket";
+import { useNavigate } from "react-router-dom";
 
 interface AvartarModeProps{
   cameraRef: React.MutableRefObject<PerspectiveCameraType | undefined>,
@@ -28,11 +29,15 @@ function Avatar({cameraRef, user}: AvartarModeProps){
   );
   const walk = Object.keys(actions).find((key)=> key.toLowerCase().includes("walk"));
   const groupRef = useRef<Group>(null);
+  const navigate = useNavigate();
 
   useEffect(()=>{
     // console.log(gltf)
     // console.log(groupRef.current);
     actions[idleAction ?? ""]?.play()
+    if(!user){
+      navigate("/joinRoom")
+    }
   })
 
    // Function to start the walking animation

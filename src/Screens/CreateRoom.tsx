@@ -9,6 +9,7 @@ export const CreateRoom = () => {
   const { createRoom } = useSocket();
   const navigate = useNavigate();
   const modelName = localStorage.getItem('userAvatar') ?? "";
+  const username = localStorage.getItem('username') ?? "";
 
   useEffect(()=>{
     let token = localStorage.getItem('token')
@@ -24,7 +25,7 @@ export const CreateRoom = () => {
       return;
     }
 
-    createRoom(roomName, modelName, (response) => {
+    createRoom(username, roomName, modelName, (response) => {
       if (response.success) {
         console.log("Room created:", response.roomId);
         localStorage.setItem('roomId',response.roomId);
